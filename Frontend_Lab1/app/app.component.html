@@ -1,0 +1,207 @@
+<div class="mainBlock">
+  <div class="filters">
+    <h3>Фильтры</h3>
+    <mat-slide-toggle color="accent" [(ngModel)]="filter.isActive"></mat-slide-toggle>
+    <mat-list>
+
+      <mat-list-item>
+        <mat-form-field appearance="standard">
+          <mat-label>Name</mat-label>
+          <input matInput [(ngModel)]="filter.fields.get('name')!!.data">
+        </mat-form-field>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-form-field class="filter_field" appearance="standard">
+          <mat-label>X</mat-label>
+          <input matInput [(ngModel)]="filter.fields.get('coordinates.x')!!.data">
+        </mat-form-field>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-form-field appearance="standard">
+          <mat-label>Y</mat-label>
+          <input matInput [(ngModel)]="filter.fields.get('coordinates.y')!!.data">
+        </mat-form-field>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-form-field class="example-full-width" appearance="standard">
+          <mat-label>Creation Date</mat-label>
+          <input matInput [matDatepicker]="picker" [(ngModel)]="filter.fields.get('creationDate')!!.data">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <!--        <mat-datepicker [dateClass]="dateClass" #picker></mat-datepicker>-->
+          <mat-datepicker [dateClass]="dateClass" #picker></mat-datepicker>
+        </mat-form-field>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-form-field appearance="standard">
+          <mat-label>Price</mat-label>
+          <input matInput [(ngModel)]="filter.fields.get('price')!!.data">
+        </mat-form-field>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-form-field appearance="standard">
+          <mat-label>Discount</mat-label>
+          <input matInput [(ngModel)]="filter.fields.get('discount')!!.data">
+        </mat-form-field>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-form-field appearance="standard">
+          <mat-label>Comment</mat-label>
+          <input matInput [(ngModel)]="filter.fields.get('comment')!!.data">
+        </mat-form-field>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-form-field appearance="standard">
+          <mat-label>Type</mat-label>
+          <mat-select [(ngModel)]="filter.fields.get('type')!!.data">
+            <mat-option *ngFor="let typeRange of typeRanges" [value]="typeRange">{{typeRange}}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-form-field appearance="standard">
+          <mat-label>Event - Name</mat-label>
+          <input matInput [(ngModel)]="filter.fields.get('event.name')!!.data">
+        </mat-form-field>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-form-field appearance="standard">
+          <mat-label>Event - Date</mat-label>
+          <input matInput type="datetime-local" [(ngModel)]="filter.fields.get('event.date')!!.data">
+        </mat-form-field>
+      </mat-list-item>
+
+      <mat-list-item>
+        <mat-form-field appearance="standard">
+          <mat-label>Event - Minimum Age</mat-label>
+          <input matInput [(ngModel)]="filter.fields.get('event.minage')!!.data">
+        </mat-form-field>
+      </mat-list-item>
+      <button mat-flat-button color="primary" class="buttons_menu button_table"
+              (click)="getTickets()">Отфильтровать
+        <mat-icon>filter_list</mat-icon>
+      </button>
+
+    </mat-list>
+
+  </div>
+
+  <div class="tickets_table">
+    <div class="mat-elevation-z8" id="tickets_table">
+      <table #ticketsTable mat-table [dataSource]="tickets" matSort (matSortChange)="sortData($event)">
+
+        <!-- Position Column -->
+        <ng-container matColumnDef="position">
+          <th mat-header-cell *matHeaderCellDef>No.</th>
+          <td mat-cell *matCellDef="let element;let i = index">{{i + 1}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+          <td mat-cell *matCellDef="let element">{{element.id}}</td>
+        </ng-container>
+
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+          <td mat-cell *matCellDef="let element">{{element.name}}</td>
+        </ng-container>
+
+        <!-- Weight Column -->
+        <ng-container matColumnDef="coordinates.x">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>X</th>
+          <td mat-cell *matCellDef="let element">{{element.coordinates.x}}</td>
+        </ng-container>
+
+        <!-- Symbol Column -->
+        <ng-container matColumnDef="coordinates.y">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Y</th>
+          <td mat-cell *matCellDef="let element">{{element.coordinates.y}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="creationDate">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Creation Date</th>
+          <td mat-cell *matCellDef="let element">{{element.creationDate}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+          <td mat-cell *matCellDef="let element">{{element.price}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="discount">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Discount</th>
+          <td mat-cell *matCellDef="let element">{{element.discount}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="comment">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Comment</th>
+          <td mat-cell *matCellDef="let element">{{element.comment}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="type">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+          <td mat-cell *matCellDef="let element">{{element.type.toString()}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="event.name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Event Name</th>
+          <td mat-cell *matCellDef="let element">{{element.event.name}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="event.date">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Event - Date</th>
+          <td mat-cell *matCellDef="let element">{{element.event.date}} </td>
+        </ng-container>
+
+        <ng-container matColumnDef="event.minAge">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Event - minAge</th>
+          <td mat-cell *matCellDef="let element">{{element.event.minAge}}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="edit" r>
+          <th mat-header-cell *matHeaderCellDef>Редактирование</th>
+          <td mat-cell *matCellDef="let element;let i = index">
+            <button mat-flat-button color="primary" class="buttons_menu button_table"
+                    (click)="openAddTicketDialog(false, i)">Изменить
+              <mat-icon>cached</mat-icon>
+            </button>
+            <button mat-flat-button color="warn" class="button_table" (click)="deleteTicket(i)">Удалить
+              <mat-icon>delete_forever</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+      <mat-paginator [length]="countAll"
+                     showFirstLastButtons
+                     [pageSize]="perPage"
+                     [pageSizeOptions]="[perPage]"
+                     (page)="paginator($event)"
+                     aria-label="Select page">
+      </mat-paginator>
+    </div>
+
+  </div>
+</div>
+<div class="right-corner-menu">
+
+  <button mat-fab color="primary" aria-label="Add Ticket" class="buttons_menu" (click)="openAddTicketDialog(true, 0)">
+    <mat-icon>note_add</mat-icon>
+  </button>
+
+  <button mat-fab color="basic" aria-label="Example icon button with a bookmark icon" class="buttons_menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+</div>

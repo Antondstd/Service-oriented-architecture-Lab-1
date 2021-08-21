@@ -1,0 +1,138 @@
+div {
+  display: inline-block;
+}
+
+.mainBlock {
+  width: 80%;
+  vertical-align: center;
+  margin-top: 5%;
+}
+
+h3 {
+  display: inline-block;
+  align-self: center;
+  margin: 8px 8px 0px 0px;
+}
+
+table {
+  width: 100%;
+  text-align: center;
+}
+
+.mat-cell {
+  font-size: 0.7vw;
+}
+
+.filters {
+  width: 15%;
+  font-size: 12px;
+  padding: 15px;
+  margin: 0;
+  box-shadow: 0px 5px 5px -3px rgb(0 0 0 / 20%), 0px 8px 10px 1px rgb(0 0 0 / 14%), 0px 3px 14px 2px rgb(0 0 0 / 12%);
+  background: #fff;
+}
+
+.mat-list {
+  /*padding: 0px;*/
+}
+
+.mat-list-item {
+  font-size: 12px;
+}
+
+mat-form-field {
+  width: 100%;
+}
+
+.mat-column-id {
+  text-align: center;
+  padding: 0 8px 0 8px;
+}
+
+.mat-column-name {
+  text-align: center;
+}
+
+.mat-column-x {
+  text-align: center;
+  padding: 0 8px 0 8px;
+}
+
+.mat-column-y {
+  text-align: center;
+  padding: 0 8px 0 8px;
+}
+
+.mat-column-creationDate {
+  text-align: center;
+}
+
+.mat-column-price {
+  text-align: center;
+  padding: 0 8px 0 8px;
+}
+
+.mat-column-discount {
+  text-align: center;
+  padding: 0 8px 0 8px;
+}
+
+.mat-column-comment {
+  text-align: center;
+  padding: 0 8px 0 8px;
+}
+
+.mat-column-type {
+  text-align: center;
+  padding: 0 8px 0 8px;
+}
+
+.mat-column-event.name {
+  text-align: center;
+  padding: 0 8px 0 8px;
+}
+
+.mat-column-event.ticketsCount {
+  text-align: center;
+  padding: 0 8px 0 8px;
+}
+
+.mat-column-event.type {
+  text-align: center;
+  padding: 0 8px 0 8px;
+}
+
+.mat-column-edit {
+  text-align: center;
+}
+
+.tickets_table {
+  width: 80%;
+  vertical-align: top;
+  padding: 0;
+  margin: 0 0 0 15px;
+}
+
+#tickets_table {
+  width: 100%;
+}
+
+.right-corner-menu {
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin: 25px;
+}
+
+.buttons_menu {
+  margin: 0 8px 0 8px;
+}
+
+.button_table {
+  font-size: 0.5vw;
+}
+
+#add-button {
+  font-size: 35px;
+  margin-bottom: 0px;
+}
