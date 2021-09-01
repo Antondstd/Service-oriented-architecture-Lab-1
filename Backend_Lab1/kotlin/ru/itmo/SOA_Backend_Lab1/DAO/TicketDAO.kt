@@ -1,17 +1,12 @@
 package ru.itmo.SOA_Backend_Lab1.DAO
 
-import ru.itmo.SOA_Backend_Lab1.Model.Coordinates
-import ru.itmo.SOA_Backend_Lab1.Model.Event
-import ru.itmo.SOA_Backend_Lab1.Model.Ticket
 import ru.itmo.SOA_Backend_Lab1.Util.HibernateUtil
 import org.hibernate.Transaction
+import ru.itmo.SOA_Backend_Lab1.Model.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.ejb.Stateless
-import javax.persistence.criteria.Join
-import javax.persistence.criteria.Order
-import javax.persistence.criteria.Path
-import javax.persistence.criteria.Predicate
+import javax.persistence.criteria.*
 
 
 @Stateless
@@ -113,14 +108,87 @@ abstract class TicketDAO {
         }
     }
 
-    fun getCountAndLastPageTicket():Long?{
+    fun getSortedFilteredTickets(
+        page: Int,
+        perPage: Int,
+        sortAdditions: List<QueryAdditions>,
+        filterAdditions: List<QueryAdditions>
+    ): List<Ticket>? {
+        var transaction: Transaction? = null
+        try {
+            val session = HibernateUtil.sessionFactory?.openSession()
+            val criteriaBuilder = session?.criteriaBuilder!!
+            val q = criteriaBuilder.createQuery(Ticket::class.java)
+            val root = q.from(Ticket::class.java)
+            var res = q.select(root)
+            if (sortAdditions.size > 0) {
+                addClause(sortAdditions,root,true,q,criteriaBuilder)
+            }
+            if (filterAdditions.size > 0) {
+                addClause(filterAdditions,root,false,q,criteriaBuilder)
+                }
+
+            return session.createQuery(res).setFirstResult((page-1)*perPage).setMaxResults(perPage).resultList
+        } catch (e: Exception) {
+            if (transaction != null)
+                transaction.rollback()
+            e.printStackTrace()
+            return null
+        }
+    }
+
+    fun addClause(clause:List<QueryAdditions>, root:Root<Ticket>, type:Boolean, resultQuery: CriteriaQuery<*>, criteriaBuilder: CriteriaBuilder){
+        val coordinatesJoin: Join<Ticket, Coordinates> = root.join("coordinates")
+        val eventJoin: Join<Ticket, Event> = root.join("event")
+        val orders = mutableListOf<Order>()
+        val conditions: MutableList<Predicate?> = mutableListOf()
+
+        clause.forEach { addition ->
+            val cur: Path<String>
+            cur = when (addition.table) {
+                TablesQueryAdditions.TICKET -> root.get<String>(addition.column)
+                TablesQueryAdditions.COORDINATES -> coordinatesJoin.get<String>(addition.column)
+                TablesQueryAdditions.EVENT -> eventJoin.get<String>(addition.column)
+                else -> return@forEach
+            }
+            if (type) {
+                if (addition.sortType)
+                    orders.add(criteriaBuilder.asc(cur))
+                else (addition.sortType)
+                    orders.add(criteriaBuilder.desc(cur))
+
+            } else{
+                if (addition.column.equals("date") || addition.column.equals("creationDate")) {
+                    val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yy")
+                    val date = LocalDateTime.parse(addition.firstValue, formatter)
+                    conditions.add(criteriaBuilder.equal(cur, addition.firstValue))
+                } else
+                    conditions.add(criteriaBuilder.equal(cur, addition.firstValue))
+            }
+        }
+        if (type)
+            resultQuery.orderBy(orders)
+        else
+            resultQuery.where(criteriaBuilder.or(*conditions.toTypedArray()))
+    }
+
+    fun getCountTicket(filterAdditions: List<QueryAdditions>?):Long?{
         var transaction: Transaction? = null
         try {
             val session = HibernateUtil.sessionFactory?.openSession()
             transaction = session?.beginTransaction()
             if (transaction == null || session == null)
                 return null
-            val count = session.createQuery("Select count(t.id) from Ticket t").singleResult
+            val criteriaBuilder = session.criteriaBuilder!!
+            val createQueryCount = criteriaBuilder.createQuery(Long::class.java)
+//            val createQueryTicket = criteriaBuilder.createQuery(Ticket::class.java)
+            val root = createQueryCount.from(Ticket::class.java)
+            println("FILTER COUNT")
+            if (filterAdditions != null && filterAdditions.size > 0) {
+                addClause(filterAdditions, root, false, createQueryCount, criteriaBuilder)
+            }
+            createQueryCount.select(criteriaBuilder.count(root))
+            val count = session.createQuery(createQueryCount).singleResult
             transaction.commit()
             return count as Long
         } catch (e: Exception) {
