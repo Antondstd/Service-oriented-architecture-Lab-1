@@ -29,7 +29,7 @@ export class TicketsService {
 
   }
 
-  getTickets(page: number, ticketsPerPage: number, sortState: Array<String>, filter: Filter): Observable<String> {
+  getTickets(page: number, ticketsPerPage: number, sortState: Array<String>, filter: Filter): Observable<String> { //длинный список параметров
     const myHeaders = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');
     var params = new HttpParams().append('page', page)
       .append('perPage', ticketsPerPage)
@@ -38,7 +38,10 @@ export class TicketsService {
       filter.fields.forEach((field: FilterField, key: String) => {
           if (field.isActive && field.data != null && field.data != "")
             if (key == "event.date" || key == "creationDate")
-              params = params.append(key.toString(), dateformat(field.data.toString(), "HH:MM:ss dd/mm/yy"))
+              if (key == "event.date")
+                params = params.append(key.toString(), dateformat(field.data.toString(), "HH:MM:ss dd/mm/yy"))
+                else
+                params = params.append(key.toString(), dateformat(field.data.toString(), "HH:MM:ss dd/mm/yy z"))
             else
               params = params.append(key.toString(), field.data.toString())
         }

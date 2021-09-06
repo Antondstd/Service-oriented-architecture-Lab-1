@@ -28,11 +28,11 @@ export class AppComponent {
   tickets: Array<Ticket> = []
   sortStateArray: Array<String> = []
   sortedState: Map<String, String> = new Map()
-  currentPage: number = 1
-  lastPage: number = 1
-  perPage: number = 2
-  countAll: number = 1
-  displayedColumns: string[] = ['position',
+  currentPage: number = 1 //Замена значения данных = объектом
+  lastPage: number = 1 //Замена значения данных = объектом
+  perPage: number = 2 //Замена значения данных = объектом
+  countAll: number = 1 //Замена значения данных = объектом
+  displayedColumns: string[] = ['position', //Замена значения данных = объектом
     'id',
     'name',
     'coordinates.x',
@@ -82,7 +82,7 @@ export class AppComponent {
   }
 
   getTickets() {
-    this.ticketService.getTickets(this.currentPage, this.perPage, this.sortStateArray, this.filter).subscribe(((response: String) => {
+    this.ticketService.getTickets(this.currentPage, this.perPage, this.sortStateArray, this.filter).subscribe(((response: String) => { //Длинный список параметров
       xml2js.parseString(response, {explicitArray: false}, (error: string | undefined, result: any) => {
         if (error) {
           console.log(error)
@@ -200,6 +200,7 @@ export class AddTicketDialog {
   eventTypeRanges = Object.values(EventType)
   isNew: Boolean = true
   curDate: Date = new Date()
+  // eventDate: Date = new Date()
   eventDate: String = new Date().toISOString().slice(0, 16)
   parser = new xml2js.Parser();
   builder = new xml2js.Builder()
@@ -213,8 +214,8 @@ export class AddTicketDialog {
     this.isNew = data.isNew
     if (!this.isNew) {
       // this.eventDate = new Date(moment(data.ticket.event.date.toString(),'H:m:s dd/MM/yy',true).format())
-      let mom = moment(data.ticket.event.date.toString(), 'HH:mm:ss DD/MM/YY', true).format("YYYY-MM-DDTHH:mm")
-      this.eventDate = mom.slice(0, 16)
+      let mom = moment(data.ticket.event.date.toString(), 'HH:mm:ss DD/MM/YY z', true).format("YYYY-MM-DDTHH:mm z")
+      // this.eventDate = new Date(mom)
     }
   }
 
@@ -222,14 +223,14 @@ export class AddTicketDialog {
     console.log(this.ticket)
     // console.log(this.builder.build(this.ticket))
     var builder = new xml2js.Builder({'rootName': 'Ticket'});
-    this.ticket.creationDate = dateformat(this.curDate, "HH:MM:ss dd/mm/yy")
-    this.ticket.event.date = dateformat(this.eventDate, "HH:MM:ss dd/mm/yy")
+    this.ticket.creationDate = dateformat(this.curDate, "HH:MM:ss dd/mm/yy z") //extract method
+    this.ticket.event.date = dateformat(this.eventDate, "HH:MM:ss dd/mm/yy") //extract method
     var xml = builder.buildObject(this.ticket);
     console.log(xml)
 
     this.ticketService.addTicket(this.ticket).toPromise().then((response: Response) => {
       if (response.ok) {
-        this.openSnackBarMessage("Successfully added new Ticket")
+        this.openSnackBarMessage("Successfully added new Ticket") // Дублирующий код
         this.dialogRef.close(true);
       } else {
         this.openSnackBarMessage("Wasn't able to add the Ticket :(")
@@ -242,14 +243,14 @@ export class AddTicketDialog {
     console.log(this.ticket)
     // console.log(this.builder.build(this.ticket))
     var builder = new xml2js.Builder({'rootName': 'Ticket'});
-    this.ticket.creationDate = dateformat(this.curDate, "HH:MM:ss dd/mm/yy")
+    this.ticket.creationDate = dateformat(this.curDate, "HH:MM:ss dd/mm/yy z")
     console.log("DATA AAAA : " + this.eventDate)
     this.ticket.event.date = dateformat(this.eventDate, "HH:MM:ss dd/mm/yy")
     var xml = builder.buildObject(this.ticket);
     console.log(xml)
     this.ticketService.updateTicket(this.ticket).toPromise().then((response: Response) => {
       if (response.ok) {
-        this.openSnackBarMessage("Successfully updated the Ticket")
+        this.openSnackBarMessage("Successfully updated the Ticket") // Дублирующий код
         this.dialogRef.close(true);
       } else {
         this.openSnackBarMessage("Wasn't able to update the Ticket :(")
@@ -261,7 +262,7 @@ export class AddTicketDialog {
 
   openSnackBarMessage(message: string) {
     this._snackBar.open(message, "close", {
-      duration: 4 * 1000,
+      duration: 4 * 1000, // magic number
       horizontalPosition: 'left',
       verticalPosition: 'bottom',
     });
