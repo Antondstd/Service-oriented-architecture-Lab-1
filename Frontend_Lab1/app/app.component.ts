@@ -224,8 +224,8 @@ export class AddTicketDialog {
     console.log(this.ticket)
     // console.log(this.builder.build(this.ticket))
     var builder = new xml2js.Builder({'rootName': 'Ticket'});
-    this.ticket.creationDate = dateformat(this.curDate, "HH:MM:ss dd/mm/yy") //extract method
-    this.ticket.event.date = dateformat(this.eventDate, "HH:MM:ss dd/mm/yy") //extract method
+    this.ticket.setCreationDateFromDate(this.curDate)
+    this.ticket.event.setDateFromString(this.eventDate)
     var xml = builder.buildObject(this.ticket);
     console.log(xml)
 
