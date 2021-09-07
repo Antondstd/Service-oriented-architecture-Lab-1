@@ -185,7 +185,7 @@ export class AppComponent {
 
   paginator(event: PageEvent) {
     this.currentPage = event.pageIndex + 1
-    console.log("NOW PageIndex is "+event.pageIndex)
+    console.log("NOW PageIndex is " + event.pageIndex)
     this.getTickets()
   }
 }
@@ -223,20 +223,24 @@ export class AddTicketDialog {
     console.log(this.ticket)
     // console.log(this.builder.build(this.ticket))
     var builder = new xml2js.Builder({'rootName': 'Ticket'});
-    this.ticket.creationDate = dateformat(this.curDate, "HH:MM:ss dd/mm/yy z") //extract method
+    this.ticket.creationDate = dateformat(this.curDate, "HH:MM:ss dd/mm/yy") //extract method
     this.ticket.event.date = dateformat(this.eventDate, "HH:MM:ss dd/mm/yy") //extract method
     var xml = builder.buildObject(this.ticket);
     console.log(xml)
 
     this.ticketService.addTicket(this.ticket).toPromise().then((response: Response) => {
-      if (response.ok) {
-        this.openSnackBarMessage("Successfully added new Ticket") // Дублирующий код
-        this.dialogRef.close(true);
-      } else {
-        this.openSnackBarMessage("Wasn't able to add the Ticket :(")
-        this.dialogRef.close(false);
-      }
+      this.showMessageAndCloseDialog(response.ok)
     })
+  }
+
+  showMessageAndCloseDialog(responseAnswer: Boolean) {
+    if (responseAnswer) {
+      this.openSnackBarMessage("Successfully added new Ticket")
+      this.dialogRef.close(true);
+    } else {
+      this.openSnackBarMessage("Wasn't able to add the Ticket :(")
+      this.dialogRef.close(false);
+    }
   }
 
   update(): void {
@@ -249,13 +253,7 @@ export class AddTicketDialog {
     var xml = builder.buildObject(this.ticket);
     console.log(xml)
     this.ticketService.updateTicket(this.ticket).toPromise().then((response: Response) => {
-      if (response.ok) {
-        this.openSnackBarMessage("Successfully updated the Ticket") // Дублирующий код
-        this.dialogRef.close(true);
-      } else {
-        this.openSnackBarMessage("Wasn't able to update the Ticket :(")
-        this.dialogRef.close(false);
-      }
+      this.showMessageAndCloseDialog(response.ok)
     })
     this.dialogRef.close();
   }
