@@ -204,6 +204,7 @@ export class AddTicketDialog {
   eventDate: String = new Date().toISOString().slice(0, 16)
   parser = new xml2js.Parser();
   builder = new xml2js.Builder()
+  SNACK_BAR_DURATION = 4 * 1000
 
   constructor(
     public dialogRef: MatDialogRef<AddTicketDialog>,
@@ -260,7 +261,7 @@ export class AddTicketDialog {
 
   openSnackBarMessage(message: string) {
     this._snackBar.open(message, "close", {
-      duration: 4 * 1000, // magic number
+      duration: this.SNACK_BAR_DURATION,
       horizontalPosition: 'left',
       verticalPosition: 'bottom',
     });
