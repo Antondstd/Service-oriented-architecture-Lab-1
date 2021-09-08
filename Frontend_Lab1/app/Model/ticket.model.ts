@@ -1,6 +1,8 @@
 import {Time} from "@angular/common";
 import {Coordinates} from "./coordinates.model";
 import {Event} from "./event.model";
+// @ts-ignore
+import * as dateformat from 'dateformat';
 
 export class Ticket {
   id:number = 0;
@@ -17,6 +19,10 @@ export class Ticket {
     obj && Object.assign(this,obj)
     this.coordinates = new Coordinates(obj.coordinates)
     this.event = new Event(obj.event)
+  }
+
+  setCreationDateFromDate(date:Date){
+    this.creationDate = dateformat(date, "HH:MM:ss dd/mm/yy")
   }
 
   // constructor(obj:any) {

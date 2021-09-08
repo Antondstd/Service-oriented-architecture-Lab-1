@@ -1,3 +1,6 @@
+// @ts-ignore
+import * as dateformat from 'dateformat';
+
 export class Event {
   id:number = 0
   name:String = ""
@@ -8,6 +11,13 @@ export class Event {
 
   constructor(obj:any) {
     obj && Object.assign(this,obj)
+  }
+
+  setDateFromDate(date:Date){
+    this.date = dateformat(date, "HH:MM:ss dd/mm/yy")
+  }
+  setDateFromString(date:String){
+    this.date = dateformat(date, "HH:MM:ss dd/mm/yy")
   }
 }
 

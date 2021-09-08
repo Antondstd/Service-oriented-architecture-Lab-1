@@ -161,7 +161,8 @@ abstract class TicketDAO {
                 if (addition.column.equals("date") || addition.column.equals("creationDate")) {
                     val formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yy")
                     val date = LocalDateTime.parse(addition.firstValue, formatter)
-                    conditions.add(criteriaBuilder.equal(cur, addition.firstValue))
+//                    conditions.add(criteriaBuilder.equal(cur, addition.firstValue))
+                    conditions.add(criteriaBuilder.equal(cur, date))
                 } else
                     conditions.add(criteriaBuilder.equal(cur, addition.firstValue))
             }

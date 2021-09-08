@@ -15,7 +15,9 @@ import {MatTable} from "@angular/material/table";
 import {MatSnackBar, MatSnackBarModule} from "@angular/material/snack-bar";
 import {MatSort, Sort} from "@angular/material/sort";
 import {ResponsePagesTickets} from "./response-pages-tickets.model";
-import {PageEvent} from "@angular/material/paginator";
+import {MatPaginator, PageEvent} from "@angular/material/paginator";
+import {TableAdditions} from "./Model/table-additions.model";
+
 
 @Component({
   selector: 'app-root',
@@ -26,26 +28,13 @@ export class AppComponent {
   filter: Filter = new Filter()
   title = 'SOA_Lab1'
   tickets: Array<Ticket> = []
+  additionForTable = new TableAdditions()
   sortStateArray: Array<String> = []
   sortedState: Map<String, String> = new Map()
   currentPage: number = 1 //Замена значения данных = объектом
   lastPage: number = 1 //Замена значения данных = объектом
   perPage: number = 2 //Замена значения данных = объектом
   countAll: number = 1 //Замена значения данных = объектом
-  displayedColumns: string[] = ['position', //Замена значения данных = объектом
-    'id',
-    'name',
-    'coordinates.x',
-    'coordinates.y',
-    'creationDate',
-    'price',
-    'discount',
-    'comment',
-    'type',
-    'event.name',
-    'event.date',
-    'event.minAge',
-    'edit']
   // @ts-ignore
   typeRanges = Object.values(TicketType)
   selectedTypeRange = this.typeRanges[0]
@@ -55,6 +44,8 @@ export class AppComponent {
 
   @ViewChild(MatTable, {static: false})
   ticketsTable!: MatTable<any>
+
+  @ViewChild(MatPaginator) paginator1!: MatPaginator;
 
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -68,21 +59,10 @@ export class AppComponent {
               private _snackBar: MatSnackBar) {
     console.log(this.eventTypeRanges)
     this.getTickets()
-    this.filter.fields.set("name", new FilterField())
-    this.filter.fields.set("coordinates.x", new FilterField())
-    this.filter.fields.set("coordinates.y", new FilterField())
-    this.filter.fields.set("creationDate", new FilterField())
-    this.filter.fields.set("price", new FilterField())
-    this.filter.fields.set("discount", new FilterField())
-    this.filter.fields.set("comment", new FilterField())
-    this.filter.fields.set("type", new FilterField())
-    this.filter.fields.set("event.name", new FilterField())
-    this.filter.fields.set("event.date", new FilterField())
-    this.filter.fields.set("event.minage", new FilterField())
   }
 
   getTickets() {
-    this.ticketService.getTickets(this.currentPage, this.perPage, this.sortStateArray, this.filter).subscribe(((response: String) => { //Длинный список параметров
+    this.ticketService.getTickets(this.additionForTable, this.sortStateArray).subscribe(((response: String) => { //Длинный список параметров
       xml2js.parseString(response, {explicitArray: false}, (error: string | undefined, result: any) => {
         if (error) {
           console.log(error)
@@ -92,10 +72,12 @@ export class AppComponent {
           console.log(response)
           console.log(result)
           console.log(result.ResponsePagesTickets)
-          this.currentPage = responsePagesTickets.currentPage
-          this.lastPage = responsePagesTickets.lastPage
-          this.perPage = responsePagesTickets.perPage
-          this.countAll = responsePagesTickets.countAll
+          if (this.additionForTable.currentPage > responsePagesTickets.currentPage){
+            this.paginator1.pageIndex = responsePagesTickets.currentPage - 1
+          }
+          this.additionForTable.currentPage = responsePagesTickets.currentPage
+          this.additionForTable.lastPage = responsePagesTickets.lastPage
+          this.additionForTable.countAll = responsePagesTickets.countAll
           if (responsePagesTickets.tickets != "") {
             if (responsePagesTickets.tickets.Ticket.constructor == Array) {
               this.tickets = responsePagesTickets.tickets.Ticket
@@ -184,7 +166,7 @@ export class AppComponent {
   }
 
   paginator(event: PageEvent) {
-    this.currentPage = event.pageIndex + 1
+    this.additionForTable.currentPage = event.pageIndex + 1
     console.log("NOW PageIndex is " + event.pageIndex)
     this.getTickets()
   }
@@ -201,7 +183,7 @@ export class AddTicketDialog {
   isNew: Boolean = true
   curDate: Date = new Date()
   // eventDate: Date = new Date()
-  eventDate: String = new Date().toISOString().slice(0, 16)
+  eventDate = new Date()
   parser = new xml2js.Parser();
   builder = new xml2js.Builder()
   SNACK_BAR_DURATION = 4 * 1000
@@ -225,7 +207,7 @@ export class AddTicketDialog {
     // console.log(this.builder.build(this.ticket))
     var builder = new xml2js.Builder({'rootName': 'Ticket'});
     this.ticket.setCreationDateFromDate(this.curDate)
-    this.ticket.event.setDateFromString(this.eventDate)
+    this.ticket.event.setDateFromDate(this.eventDate)
     var xml = builder.buildObject(this.ticket);
     console.log(xml)
 
@@ -245,12 +227,9 @@ export class AddTicketDialog {
   }
 
   update(): void {
-    console.log(this.ticket)
-    // console.log(this.builder.build(this.ticket))
     var builder = new xml2js.Builder({'rootName': 'Ticket'});
-    this.ticket.creationDate = dateformat(this.curDate, "HH:MM:ss dd/mm/yy z")
-    console.log("DATA AAAA : " + this.eventDate)
-    this.ticket.event.date = dateformat(this.eventDate, "HH:MM:ss dd/mm/yy")
+    this.ticket.setCreationDateFromDate(this.curDate)
+    this.ticket.event.setDateFromDate(this.eventDate)
     var xml = builder.buildObject(this.ticket);
     console.log(xml)
     this.ticketService.updateTicket(this.ticket).toPromise().then((response: Response) => {

@@ -24,24 +24,36 @@ class TicketService() : TicketDAO() {
         val regExName = "(\\w+).(\\w+)".toRegex()
         val sortMap: MutableMap<String, Pair<String, String>> = mutableMapOf() // Map<col,<table,sortType>>
         val sortQueryAdditions: MutableList<QueryAdditions> = mutableListOf()
-        val filerQueryAdditions:MutableList<QueryAdditions> = mutableListOf()
+        val filerQueryAdditions: MutableList<QueryAdditions> = mutableListOf()
 
 
         sortStateList?.forEach {
             val values: List<String>? = regExParam.find(it)?.groupValues //value(1) -> sortType, (2) -> table.col or col
             if (values != null) {
                 if (!values[2].contains("."))
-                    sortQueryAdditions.add(QueryAdditions(TablesQueryAdditions.TICKET,values[2],sortType = values[1] == "asc"))
+                    sortQueryAdditions.add(
+                        QueryAdditions(
+                            TablesQueryAdditions.TICKET,
+                            values[2],
+                            sortType = values[1] == "asc"
+                        )
+                    )
 //                    sortMap[values[2]] = Pair("ticket", values[1])
                 else {
                     val classAndValue = regExName.find(values[2])
-                    val table = when(classAndValue?.groupValues?.get(1)){
+                    val table = when (classAndValue?.groupValues?.get(1)) {
                         "coordinates" -> TablesQueryAdditions.COORDINATES
                         "event" -> TablesQueryAdditions.EVENT
                         else -> null
                     }
                     if (table != null && classAndValue != null) {
-                            sortQueryAdditions.add(QueryAdditions(table, classAndValue.groupValues[2], sortType = values[1] == "asc" ))
+                        sortQueryAdditions.add(
+                            QueryAdditions(
+                                table,
+                                classAndValue.groupValues[2],
+                                sortType = values[1] == "asc"
+                            )
+                        )
 //                        sortMap.put(
 //                            classAndValue.groupValues[2],
 //                            Pair(classAndValue.groupValues[1], values[1])
@@ -51,8 +63,7 @@ class TicketService() : TicketDAO() {
             }
         }
 
-        filterMap.forEach{
-            key,value ->
+        filterMap.forEach { key, value ->
             var name = mutableListOf<String>()
             if (key.contains("."))
                 name = key.split(".").toMutableList()
@@ -60,25 +71,28 @@ class TicketService() : TicketDAO() {
                 name.add(0, "ticket")
                 name.add(1, key)
             }
-            val table = when(name[0]){
-            "coordinates" -> TablesQueryAdditions.COORDINATES
-            "event" -> TablesQueryAdditions.EVENT
-            else -> TablesQueryAdditions.TICKET
+            val table = when (name[0]) {
+                "coordinates" -> TablesQueryAdditions.COORDINATES
+                "event" -> TablesQueryAdditions.EVENT
+                else -> TablesQueryAdditions.TICKET
             }
-            filerQueryAdditions.add(QueryAdditions(table,name[1],value[0], if (value.size > 1) value[1] else null))
+            filerQueryAdditions.add(QueryAdditions(table, name[1], value[0], if (value.size > 1) value[1] else null))
         }
 
         val count = getCountTicket(filerQueryAdditions)
-        var pageNumber:Int
+        println("COUNT = $count")
+        var pageNumber: Int
+        var curPage:Int = page
         if (count != null)
-            pageNumber = Math.ceil(count.toDouble() / perPage ).toInt()
+            pageNumber = Math.ceil(count.toDouble() / perPage).toInt()
         else
             return null
         if (page > pageNumber)
-            return null
+            curPage = pageNumber
 //            tickets = getSortedFilteredTickets(page,perPage,sortMap,filterMap)
-        tickets = getSortedFilteredTickets(page,perPage,sortQueryAdditions, filerQueryAdditions)
-        return ResponsePagesTickets(currentPage = page,perPage = perPage,tickets = tickets, countAll = count)
+        tickets = getSortedFilteredTickets(curPage, perPage, sortQueryAdditions, filerQueryAdditions)
+        println(tickets)
+        return ResponsePagesTickets(currentPage = curPage, perPage = perPage, tickets = tickets, countAll = count)
     }
 
     fun test() {

@@ -8,6 +8,7 @@ import {Filter} from "./app.component";
 import {FilterField} from "./app.component";
 // @ts-ignore
 import * as dateformat from 'dateformat';
+import {TableAdditions} from "./Model/table-additions.model";
 
 @Injectable({
   providedIn: 'root'
@@ -29,13 +30,13 @@ export class TicketsService {
 
   }
 
-  getTickets(page: number, ticketsPerPage: number, sortState: Array<String>, filter: Filter): Observable<String> { //длинный список параметров
+  getTickets(additionsForTable:TableAdditions, sortState: Array<String>): Observable<String> { //длинный список параметров
     const myHeaders = new HttpHeaders().set('Content-Type', 'application/x-www-form-urlencoded;charset=utf-8');
-    var params = new HttpParams().append('page', page)
-      .append('perPage', ticketsPerPage)
+    var params = new HttpParams().append('page', additionsForTable.currentPage)
+      .append('perPage', additionsForTable.perPage)
       .append('sortState', sortState.join(','));
-    if (filter.isActive) {
-      filter.fields.forEach((field: FilterField, key: String) => {
+    if (additionsForTable.filter.isActive) {
+      additionsForTable.filter.fields.forEach((field: FilterField, key: String) => {
           if (field.isActive && field.data != null && field.data != "")
             if (key == "event.date" || key == "creationDate")
               if (key == "event.date")
